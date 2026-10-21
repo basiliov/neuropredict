@@ -1,0 +1,21 @@
+@echo off
+cd /d "%~dp0"
+python -m venv .venv
+call .venv\Scripts\activate.bat
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+cd web
+where npm >nul 2>nul
+if errorlevel 1 (
+    echo npm not found. Install Node.js 20+ first.
+    exit /b 1
+)
+npm install
+start "NeuroPredict Backend" cmd /k "call ..\.venv\Scripts\activate.bat && uvicorn app.api.main:app --host 0.0.0.0 --port 8000"
+start "NeuroPredict Frontend" cmd /k "cd /d "%~dp0\web" && npm run dev -- --host 0.0.0.0"
+
+echo.
+echo NeuroPredict started.
+echo Backend: http://127.0.0.1:8000
+echo Frontend: http://127.0.0.1:5173
+pause
